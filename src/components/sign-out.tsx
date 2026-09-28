@@ -1,19 +1,10 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { authClient } from "@/lib/auth-client"
-
+// /sign-out ends the session here, or for every AXXES app via Handshake when it's on
 export function SignOut() {
-  const router = useRouter()
   return (
-    <button
-      className="text-xs text-muted hover:text-text"
-      onClick={async () => {
-        await authClient.signOut()
-        router.replace("/sign-in")
-      }}
-    >
+    <a className="text-xs text-muted hover:text-text" href="/sign-out">
       Sign out
-    </button>
+    </a>
   )
 }
