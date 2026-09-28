@@ -1,4 +1,4 @@
-# AXXES product app
+# Manifest · AXXES
 
 One product in the AXXES suite. The codename, tagline, and modules are defined in [`src/product.config.ts`](src/product.config.ts).
 
