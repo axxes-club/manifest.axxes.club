@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 
-export function SignInForm() {
+export function SignInForm({ next }: { next: string }) {
   const router = useRouter()
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
@@ -20,7 +20,7 @@ export function SignInForm() {
     })
     setPending(false)
     if (error) return setError(error.message ?? "Could not sign in")
-    router.replace("/")
+    router.replace(next)
     router.refresh()
   }
 
