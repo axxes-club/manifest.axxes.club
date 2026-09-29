@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import type { Field } from "@/lib/resource"
-import type { FormState } from "@/lib/actions"
+import type { FormState } from "@/lib/actions/resources"
 
 type Props = {
   fields: (Field & { value: string })[]

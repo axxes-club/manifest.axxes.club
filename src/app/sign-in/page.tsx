@@ -5,12 +5,18 @@ import { Logo } from "@/components/logo"
 import { product } from "@/product.config"
 import { SignInForm } from "./sign-in-form"
 
-export default async function SignInPage() {
-  if (await auth.api.getSession({ headers: await headers() })) redirect("/")
+/** Only same-app paths, so a crafted link can't bounce someone off-site after sign-in. */
+function safeNext(next: string | string[] | undefined) {
+  return typeof next === "string" && next.startsWith("/") && !next.startsWith("//") ? next : "/"
+}
+
+export default async function SignInPage({ searchParams }: PageProps<"/sign-in">) {
+  const next = safeNext((await searchParams).next)
+  if (await auth.api.getSession({ headers: await headers() })) redirect(next)
   if (HANDSHAKE_URL) {
     const h = await headers()
     const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`
-    redirect(`${HANDSHAKE_URL}/sign-in?redirect=${encodeURIComponent(`${origin}/`)}`)
+    redirect(`${HANDSHAKE_URL}/sign-in?redirect=${encodeURIComponent(`${origin}${next}`)}`)
   }
   return (
     <main className="grid min-h-dvh place-items-center px-4">
@@ -18,7 +24,7 @@ export default async function SignInPage() {
         <Logo size="lg" />
         <h1 className="mt-10 text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="mt-1 text-sm text-muted">{product.tagline} Use your AXXES account.</p>
-        <SignInForm />
+        <SignInForm next={next} />
         <p className="mt-6 text-center text-xs text-muted">
           No account?{" "}
           <a className="text-accent hover:underline" href="https://members.axxes.club/sign-up">Join AXXES</a>

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { requireContext } from "@/lib/context"
 import { getResource, getRow, refOptions } from "@/lib/data"
 import { fieldsFor, formatValue, toInputValue } from "@/lib/resource"
-import { deleteRecord, updateRecord } from "@/lib/actions"
+import { deleteRecord, updateRecord } from "@/lib/actions/resources"
 import { RecordForm } from "@/components/record-form"
 import { PageHeader, StatusBadge } from "@/components/ui"
 
