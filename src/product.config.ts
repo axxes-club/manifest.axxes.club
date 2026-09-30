@@ -1,8 +1,9 @@
+import { PRODUCT_NAME } from "@/product.name"
 import { schema as s } from "@/lib/db"
 import { defineProduct } from "@/lib/product"
 
 export const product = defineProduct({
-  name: "Manifest",
+  name: PRODUCT_NAME,
   tagline: "Inventory operations on one honest ledger. Every number explains itself.",
   accent: "#c8ff3d",
   nav: [

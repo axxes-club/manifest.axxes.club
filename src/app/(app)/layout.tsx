@@ -1,3 +1,6 @@
+import type { Metadata } from "next"
+import { BrandScope } from "@/components/brand"
+import { getCustomerBrand } from "@/lib/white-label"
 import { cookies } from "next/headers"
 import { requireContext } from "@/lib/context"
 import { db } from "@/lib/db"
@@ -11,7 +14,7 @@ import { TopBar } from "@/components/shell/top-bar"
 import { Logo, Mark } from "@/components/logo"
 import { product } from "@/product.config"
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireContext()
   await ensureWorkspace(db, ctx.tenant.id)
   const collapsed = (await cookies()).get("manifest_sidebar")?.value === "collapsed"
@@ -44,4 +47,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </CommandPalette>
     </Toaster>
   )
+}
+
+/** White-label customers see their own brand; everyone else, standard AXXES. */
+export default async function BrandedLayout(props: Parameters<typeof AppLayout>[0]) {
+  const ctx = await requireContext()
+  const brand = ctx ? await getCustomerBrand(ctx.tenant.id) : null
+  return <BrandScope brand={brand}>{await AppLayout(props)}</BrandScope>
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const ctx = await requireContext()
+  const brand = ctx ? await getCustomerBrand(ctx.tenant.id) : null
+  return brand?.faviconUrl ? { icons: { icon: brand.faviconUrl } } : {}
 }
