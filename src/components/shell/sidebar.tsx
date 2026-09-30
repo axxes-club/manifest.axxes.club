@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
-import { ChevronsUpDown, PanelLeftClose, PanelLeftOpen, Check } from "lucide-react"
+import { useEffect, useState, useTransition } from "react"
+import { ChevronsUpDown, Check } from "lucide-react"
 import type { NavSection } from "@/lib/product"
 import type { Workspace } from "@/lib/context"
 import { switchWorkspace, setSidebarCollapsed } from "@/lib/actions/shell"
@@ -32,6 +32,20 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
     setCollapsed(!collapsed)
     void setSidebarCollapsed(!collapsed)
   }
+
+  // "[" collapses the rail, matching every other AXXES product.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "[" || e.metaKey || e.ctrlKey || e.altKey) return
+      const el = document.activeElement
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return
+      e.preventDefault()
+      toggle()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collapsed])
 
   const chooseWorkspace = (id: string) =>
     start(async () => {
@@ -135,16 +149,35 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
               </div>
             )}
           </div>
-          <button
-            onClick={toggle}
-            className={`hidden w-full items-center gap-2 rounded-lg py-1.5 text-xs text-muted transition hover:bg-panel-2 hover:text-text lg:flex ${collapsed ? "justify-center" : "px-2"}`}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <PanelLeftOpen className="size-4" strokeWidth={1.5} /> : <PanelLeftClose className="size-4" strokeWidth={1.5} />}
-            {!collapsed && <span>Collapse</span>}
-            {!collapsed && <span className="ml-auto font-mono text-[10px] text-muted/50">[</span>}
-          </button>
         </div>
+
+        {/* The recognisable AXXES control: a round button riding the rail's edge.
+            It replaces the labelled "Collapse" row that used to sit down here, so
+            there is one control doing one thing, in the same place as every other
+            AXXES product. */}
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          title={collapsed ? "Expand sidebar  [" : "Collapse sidebar  ["}
+          className="absolute -right-3 top-20 hidden size-6 place-items-center rounded-full border border-line bg-panel text-muted shadow-sm transition hover:text-text lg:grid"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-4"
+            aria-hidden="true"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+            {collapsed && <path d="m16 15-3-3 3-3" />}
+          </svg>
+        </button>
       </aside>
     </>
   )
