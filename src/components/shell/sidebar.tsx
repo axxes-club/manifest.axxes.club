@@ -1,5 +1,6 @@
 "use client"
 
+import { AllAppsSwitcher } from "@/components/all-apps-switcher"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState, useTransition } from "react"
@@ -109,6 +110,7 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
         </nav>
 
         <div className="mt-6 space-y-2 border-t border-line pt-3">
+          <AllAppsSwitcher tenantId={workspace.id} compact={collapsed} />
           <div className="relative">
             <button
               onClick={() => setSwitching(!switching)}
