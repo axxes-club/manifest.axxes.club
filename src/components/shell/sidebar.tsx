@@ -47,9 +47,15 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collapsed])
 
+  const [switchError, setSwitchError] = useState<string | null>(null)
+
   const chooseWorkspace = (id: string) =>
     start(async () => {
-      await switchWorkspace(id)
+      setSwitchError(null)
+      try {
+        const result = await switchWorkspace(id)
+        if (result.error) { setSwitchError(result.error); return }
+      } catch { setSwitchError("Could not switch organization. Please try again."); return }
       setSwitching(false)
       router.push("/")
       router.refresh()
@@ -138,6 +144,7 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
                     {w.id === workspace.id && <Check className="size-3.5 text-accent" />}
                   </button>
                 ))}
+                {switchError && <p role="alert" className="px-2 py-2 text-xs text-red-500">{switchError}</p>}
                 <div className="mt-1 border-t border-line pt-1">
                   <a className="block rounded-lg px-2 py-1.5 text-sm text-muted hover:bg-panel hover:text-text" href="https://members.axxes.club/dashboard">
                     AXXES portal ↗
