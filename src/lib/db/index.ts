@@ -15,15 +15,22 @@ if (typeof WebSocket === "undefined") neonConfig.webSocketConstructor = ws
 // connect lazily, on the first query.
 const url = process.env.DATABASE_URL || "postgresql://placeholder:placeholder@placeholder/placeholder"
 
-// A localhost URL means the local dev database (`npm run db:local`), which
-// speaks plain Postgres rather than Neon's WebSocket protocol.
-const isLocal = /@(localhost|127\.0\.0\.1)(:\d+)?\//.test(url)
-
-const neonDb = () => drizzle(new NeonPool({ connectionString: url }), { schema })
-
-export const db: ReturnType<typeof neonDb> = isLocal
-  ? (drizzlePg(new pg.Pool({ connectionString: url, max: 4 }), { schema }) as unknown as ReturnType<typeof neonDb>)
-  : neonDb()
+// Neon endpoints speak WebSockets; Cloud SQL and local Postgres use pg.
+const usesNeon = new URL(url).hostname.endsWith(".neon.tech")
+const neonDb = () => drizzle(new NeonPool({ connectionString: url, max: 2 }), { schema })
+const globalForDb = globalThis as unknown as { axxesPgPool?: pg.Pool }
+function postgresDb() {
+  const pool = globalForDb.axxesPgPool ??= new pg.Pool({
+    connectionString: url,
+    max: 2,
+    connectionTimeoutMillis: 10_000,
+    idleTimeoutMillis: 30_000,
+  })
+  return drizzlePg(pool, { schema })
+}
+export const db: ReturnType<typeof neonDb> = usesNeon
+  ? neonDb()
+  : postgresDb() as unknown as ReturnType<typeof neonDb>
 
 /** Any database handle the domain layer can write through: the app pool, a transaction, or a test database. */
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>
