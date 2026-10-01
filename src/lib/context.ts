@@ -44,6 +44,7 @@ export const getContext = cache(async (): Promise<AppContext | null> => {
       and(
         eq(schema.tenantMemberships.userId, session.user.id),
         isNull(schema.tenantMemberships.deletedAt),
+        isNull(schema.tenants.deletedAt),
         ne(schema.tenants.status, "suspended"),
         ne(schema.tenants.status, "cancelled"),
       ),
