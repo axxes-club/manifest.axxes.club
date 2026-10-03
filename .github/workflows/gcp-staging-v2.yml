@@ -1,4 +1,4 @@
-name: GCP production
+name: GCP staging v2
 on:
   push:
     branches: [main]
@@ -7,7 +7,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: gcp-production-manifest
+  group: gcp-production-manifest-v2
   cancel-in-progress: false
 jobs:
   cloud-build:
@@ -46,7 +46,7 @@ jobs:
           trap cancel_unfinished_build EXIT
           trap 'exit 130' INT
           trap 'exit 143' TERM
-          build_id=$(gcloud builds submit . --project=gravy-meta --region=global --config=cloudbuild.yaml --service-account=projects/gravy-meta/serviceAccounts/cb-manifest@gravy-meta.iam.gserviceaccount.com --gcs-source-staging-dir=gs://gravy-meta-ci-manifest/source --substitutions=_TAG="$GITHUB_SHA" --async --format='value(id)')
+          build_id=$(gcloud builds submit . --project=gravy-meta --region=global --config=cloudbuild-v2.yaml --service-account=projects/gravy-meta/serviceAccounts/cb-manifest-v2@gravy-meta.iam.gserviceaccount.com --gcs-source-staging-dir=gs://gravy-meta-ci-manifest/source --substitutions=_TAG="$GITHUB_SHA" --async --format='value(id)')
           echo "Google Cloud Build: $build_id"
           poll_deadline=$((SECONDS + 3300))
           while (( SECONDS < poll_deadline )); do
