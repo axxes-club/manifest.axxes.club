@@ -134,6 +134,7 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
             {switching && (
               <div className="absolute bottom-full left-0 z-40 mb-2 w-60 rounded-xl border border-line bg-panel-2 p-1 shadow-2xl shadow-black/60">
                 <p className="px-2 pb-1 pt-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">Workspaces</p>
+                <div className="max-h-[min(60vh,20rem)] overflow-y-auto overscroll-contain">
                 {workspaces.map((w) => (
                   <button
                     key={w.id}
@@ -146,6 +147,7 @@ export function Sidebar({ sections, logo, mark, collapsed: initialCollapsed, wor
                     {w.id === workspace.id && <Check className="size-3.5 text-accent" />}
                   </button>
                 ))}
+                </div>
                 {switchError && <p role="alert" className="px-2 py-2 text-xs text-red-500">{switchError}</p>}
                 <div className="mt-1 border-t border-line pt-1">
                   <a className="block rounded-lg px-2 py-1.5 text-sm text-muted hover:bg-panel hover:text-text" href="https://members.axxes.club/dashboard">
